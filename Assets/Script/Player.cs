@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        Debug.Log("hELLO aB");
         
         /* Done Brother ye vector 3 k KIA THA?*/
     }

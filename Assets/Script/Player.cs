@@ -4,6 +4,7 @@ using UnityEngine.PlayerLoop;
 
 public class Player : MonoBehaviour
 {
+    
     [Header("Variable Intialization")]
    [ SerializeField ] private Rigidbody rb;
     [SerializeField]  private float movementSpeed = 43.0f;

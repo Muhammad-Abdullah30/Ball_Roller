@@ -1,38 +1,35 @@
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-
 
 public class Player : MonoBehaviour
 {
-    
-    [Header("Variable Intialization")]
-   [ SerializeField ] private Rigidbody rb;
-    [SerializeField]  private float movementSpeed = 43.0f;
+    [Header("Variable Initialization")]
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private float movementSpeed = 43.0f;
     [SerializeField] private float rotationalSpeed = 45.0f;
     [SerializeField] private float gameSpeed = 2.0f;
+    [SerializeField] private float speedIncreaseRate = 0.1f; // Speed increase per second
+    [SerializeField] private float maxGameSpeed = 10.0f;     // Maximum forward speed
 
     [Header("Constraint Border")]
     private float minX;
     private float maxX;
 
-    //ap kr rhy chlyga e na
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-       
 
         // Set the initial allowed range for X-axis
         minX = rb.position.x - 3f;
         maxX = rb.position.x + 3f;
-
-        /* Done Brother ye vector 3 k KIA THA?*/
     }
 
-    // Update is called once per frame
     void Update()
     {
-       
+        // Gradually increase the gameSpeed over time
+        gameSpeed += speedIncreaseRate * Time.deltaTime;
+
+        // Clamp gameSpeed to avoid exceeding the maximum speed
+        gameSpeed = Mathf.Clamp(gameSpeed, 0, maxGameSpeed);
     }
 
     void FixedUpdate()
@@ -45,7 +42,7 @@ public class Player : MonoBehaviour
 
         // Apply movement to the ball
         Vector3 combinedVelocity = forwardMovement + horizontalMovement;
-        rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
+        rb.velocity = new Vector3(combinedVelocity.x, rb.velocity.y, combinedVelocity.z);
 
         // Clamp the ball's X position within the allowed range
         Vector3 clampedPosition = rb.position;
@@ -55,8 +52,5 @@ public class Player : MonoBehaviour
         // Apply rotation for the rolling effect
         float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
         rb.AddTorque(Vector3.right * rotation);
-
-        //
-
     }
 }

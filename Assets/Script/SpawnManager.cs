@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -56,5 +57,8 @@ public class SpawnManager : MonoBehaviour
         // Instantiate the selected prefab
     }
 
-    
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
+    }
 }

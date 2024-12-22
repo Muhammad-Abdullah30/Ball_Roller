@@ -23,6 +23,11 @@ public class Player : MonoBehaviour
     [Header("Game Over Text")]
     public TextMeshProUGUI gameOver;
 
+    [Header("GameOverPannel")]
+    [SerializeField] private GameObject gameOverPanel; // Drag your Game Over Panel here
+    [SerializeField] private float panelAnimationDelay = 2.5f; // Delay before panel animation
+    [SerializeField] private float panelFadeDuration = 1f; // Duration for panel fade-in animation
+
     void Start()
     {
         gameOver.gameObject.SetActive(false);
@@ -98,7 +103,24 @@ public class Player : MonoBehaviour
             Sequence gameOverSequence = DOTween.Sequence();
             gameOverSequence
                 .Append(gameOver.DOFade(4, 4f)) // Fade in the text
-                .Join(gameOver.transform.DOScale(Vector3.one, 4f).SetEase(Ease.OutElastic)); // Scale with bounce effect
+                .Join(gameOver.transform.DOScale(Vector3.one, 4f).SetEase(Ease.OutElastic)).AppendInterval(panelAnimationDelay).OnComplete(ShowGameOverPanel); // Scale with bounce effect
+        }
+
+    }
+    private void ShowGameOverPanel()
+    {
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true); // Activate the Game Over panel
+
+            // Animate the panel (fade-in effect)
+            CanvasGroup canvasGroup = gameOverPanel.GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = gameOverPanel.AddComponent<CanvasGroup>(); // Add CanvasGroup if not present
+            }
+            canvasGroup.alpha = 0; // Ensure the panel starts transparent
+            canvasGroup.DOFade(1, panelFadeDuration); // Fade to full opacity
         }
     }
 }

@@ -11,23 +11,28 @@ public class Player : MonoBehaviour
     [SerializeField] private float rotationalSpeed = 45.0f;
     [SerializeField] private float gameSpeed = 2.0f;
 
-        //ap kr rhy chlyga e na
+    [Header("Constraint Border")]
+    private float minX;
+    private float maxX;
+
+    //ap kr rhy chlyga e na
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        Debug.Log("hELLO aB");
-        
+       
+
+        // Set the initial allowed range for X-axis
+        minX = rb.position.x - 3f;
+        maxX = rb.position.x + 3f;
+
         /* Done Brother ye vector 3 k KIA THA?*/
     }
 
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    rb.AddForce(Vector3.up*speed*Time.deltaTime,ForceMode.Impulse);
-        //}
+       
     }
 
     void FixedUpdate()
@@ -41,6 +46,11 @@ public class Player : MonoBehaviour
         // Apply movement to the ball
         Vector3 combinedVelocity = forwardMovement + horizontalMovement;
         rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
+
+        // Clamp the ball's X position within the allowed range
+        Vector3 clampedPosition = rb.position;
+        clampedPosition.x = Mathf.Clamp(rb.position.x, minX, maxX);
+        rb.position = clampedPosition;
 
         // Apply rotation for the rolling effect
         float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;

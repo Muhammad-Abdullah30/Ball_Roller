@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
 
 public class Player : MonoBehaviour
 {
@@ -19,8 +20,13 @@ public class Player : MonoBehaviour
     public TextMeshProUGUI coins;
     int coinsToBeAdded;
 
+    [Header("Game Over Text")]
+    public TextMeshProUGUI gameOver;
+
     void Start()
     {
+        gameOver.gameObject.SetActive(false);
+        gameOver.alpha = 0;
         coinsToBeAdded = 0;
         rb = GetComponent<Rigidbody>();
 
@@ -67,6 +73,32 @@ public class Player : MonoBehaviour
             coins.text = "Coins " + coinsToBeAdded;
             Debug.Log(other.gameObject.name);
             Destroy(other.gameObject);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            TriggerGameOver();
+        }
+    }
+    [ContextMenu("GameOver")]
+
+    private void TriggerGameOver()
+    {
+        if (gameOver != null)
+        {
+            gameOver.gameObject.SetActive(true); // Activate the Game Over text
+
+            // Reset initial state for animation
+            gameOver.alpha = 0; // Ensure it's transparent initially
+            gameOver.transform.localScale = Vector3.zero; // Start with no scale
+
+            // Fade-in and scale animation
+            Sequence gameOverSequence = DOTween.Sequence();
+            gameOverSequence
+                .Append(gameOver.DOFade(4, 4f)) // Fade in the text
+                .Join(gameOver.transform.DOScale(Vector3.one, 4f).SetEase(Ease.OutElastic)); // Scale with bounce effect
         }
     }
 }

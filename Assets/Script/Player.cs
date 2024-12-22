@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -14,8 +15,13 @@ public class Player : MonoBehaviour
     private float minX;
     private float maxX;
 
+    [Header("Coins Score Added")]
+    public TextMeshProUGUI coins;
+    int coinsToBeAdded;
+
     void Start()
     {
+        coinsToBeAdded = 0;
         rb = GetComponent<Rigidbody>();
 
         // Set the initial allowed range for X-axis
@@ -42,7 +48,7 @@ public class Player : MonoBehaviour
 
         // Apply movement to the ball
         Vector3 combinedVelocity = forwardMovement + horizontalMovement;
-        rb.velocity = new Vector3(combinedVelocity.x, rb.velocity.y, combinedVelocity.z);
+        rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
 
         // Clamp the ball's X position within the allowed range
         Vector3 clampedPosition = rb.position;
@@ -52,5 +58,15 @@ public class Player : MonoBehaviour
         // Apply rotation for the rolling effect
         float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
         rb.AddTorque(Vector3.right * rotation);
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Coins"))
+        {
+            coinsToBeAdded++;
+            coins.text = "Coins " + coinsToBeAdded;
+            Debug.Log(other.gameObject.name);
+            Destroy(other.gameObject);
+        }
     }
 }

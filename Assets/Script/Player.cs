@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using Unity.Android.Gradle.Manifest;
+using JetBrains.Annotations;
 
 public class Player : MonoBehaviour
 {
@@ -30,8 +32,12 @@ public class Player : MonoBehaviour
 
     [SerializeField] private bool gameOverFlag = false;
 
+    [SerializeField] public ParticleSystem gameWins;
+    public SpawnManager spawnManager;    
+
     void Start()
     {
+        spawnManager=FindObjectOfType<SpawnManager>();
         gameOver.gameObject.SetActive(false);
         gameOver.alpha = 0;
         coinsToBeAdded = 0;
@@ -91,11 +97,22 @@ public class Player : MonoBehaviour
             Debug.Log(other.gameObject.name);
             Destroy(other.gameObject);
         }
+        if (other.gameObject.CompareTag("Finish"))
+        {
+            spawnManager.CancelInvoke();
+            Debug.Log("Win");
+            gameOverFlag = true;
+            gameWins.Play();
+            ShowWinText();
+            ShowGameOverPanel();
+            InstantStopBall();
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Obstacle"))
         {
+            spawnManager.CancelInvoke();
             TriggerGameOver();
             gameOverFlag = true;
         }
@@ -134,6 +151,24 @@ public class Player : MonoBehaviour
             }
             canvasGroup.alpha = 0; // Ensure the panel starts transparent
             canvasGroup.DOFade(1, panelFadeDuration); // Fade to full opacity
+        }
+    }
+    private void ShowWinText()
+    {
+        // Step 1: Fade in and scale up the text with bounce
+        gameOver.DOFade(1, 1f); // Fade to full opacity in 1 second
+        gameOver.transform.DOScale(1.5f, 1f).SetEase(Ease.OutBounce); // Scale up with bounce effect
+
+        // Step 2: Add a pulsating effect
+        gameOver.transform.DOScale(1.3f, 0.5f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo); // Pulsate infinitely
+    }
+    private void InstantStopBall()
+    {
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero; // Completely stop linear motion
+            rb.angularVelocity = Vector3.zero; // Completely stop angular motion
+            rb.isKinematic = true; // Disable physics-based interactions instantly
         }
     }
 }

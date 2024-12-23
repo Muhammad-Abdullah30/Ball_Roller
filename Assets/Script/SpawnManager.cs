@@ -18,6 +18,7 @@ public class SpawnManager : MonoBehaviour
 
 
     private Transform playerTransform;
+    [SerializeField] private Player playerReference;
 
     private void Start()
     {
@@ -65,5 +66,21 @@ public class SpawnManager : MonoBehaviour
     public void Quit()
     {
         Application.Quit();
+    }
+
+    public void AcceleroMode()
+    {
+        playerReference.ModeSelection.gameObject.SetActive(false);
+        playerReference.GameStarted = true;
+        playerReference.Acceloro = true;
+
+    }
+
+    public void TouchMode()
+    {
+        playerReference.ModeSelection.gameObject.SetActive(false);
+        playerReference.GameStarted= true;
+        playerReference.TouchSystem = true;
+
     }
 }

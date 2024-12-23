@@ -31,9 +31,22 @@ public class Player : MonoBehaviour
     [SerializeField] private float panelFadeDuration = 1f; // Duration for panel fade-in animation
 
     [SerializeField] private bool gameOverFlag = false;
+    [SerializeField] public bool GameStarted = false;
+    [SerializeField] public bool Acceloro = false;
+    [SerializeField] public bool TouchSystem = false;
 
     [SerializeField] public ParticleSystem gameWins;
-    public SpawnManager spawnManager;    
+    public SpawnManager spawnManager;
+
+
+    [Header("ModeSelection")]
+    [SerializeField] public GameObject ModeSelection;
+
+
+    private void Awake()
+    {
+        ModeSelection.SetActive(true);
+    }
 
     void Start()
     {
@@ -50,42 +63,120 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (!gameOverFlag)
+        if (GameStarted)
         {
+            if (!gameOverFlag)
+            {
 
 
-            // Gradually increase the gameSpeed over time
-            gameSpeed += speedIncreaseRate * Time.deltaTime;
+                // Gradually increase the gameSpeed over time
+                gameSpeed += speedIncreaseRate * Time.deltaTime;
 
-            // Clamp gameSpeed to avoid exceeding the maximum speed
-            gameSpeed = Mathf.Clamp(gameSpeed, 0, maxGameSpeed);
+                // Clamp gameSpeed to avoid exceeding the maximum speed
+                gameSpeed = Mathf.Clamp(gameSpeed, 0, maxGameSpeed);
+            }
         }
     }
 
     void FixedUpdate()
     {
-        if (!gameOverFlag)
+        if (GameStarted)
         {
+            //if (!gameOverFlag)
+            //{
 
 
-            Vector3 forwardMovement = Vector3.forward * gameSpeed;
+            //    Vector3 forwardMovement = Vector3.forward * gameSpeed;
 
-            // Horizontal movement based on player input
-            float horizontalInput = Input.GetAxis("Horizontal"); // -1 for left, +1 for right
-            Vector3 horizontalMovement = Vector3.right * horizontalInput * movementSpeed;
+            //    // Horizontal movement based on player input
+            //    float horizontalInput = Input.GetAxis("Horizontal"); // -1 for left, +1 for right
+            //    Vector3 horizontalMovement = Vector3.right * horizontalInput * movementSpeed;
 
-            // Apply movement to the ball
-            Vector3 combinedVelocity = forwardMovement + horizontalMovement;
-            rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
+            //    // Apply movement to the ball
+            //    Vector3 combinedVelocity = forwardMovement + horizontalMovement;
+            //    rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
 
-            // Clamp the ball's X position within the allowed range
-            Vector3 clampedPosition = rb.position;
-            clampedPosition.x = Mathf.Clamp(rb.position.x, minX, maxX);
-            rb.position = clampedPosition;
+            //    // Clamp the ball's X position within the allowed range
+            //    Vector3 clampedPosition = rb.position;
+            //    clampedPosition.x = Mathf.Clamp(rb.position.x, minX, maxX);
+            //    rb.position = clampedPosition;
 
-            // Apply rotation for the rolling effect
-            float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
-            rb.AddTorque(Vector3.right * rotation);
+            //    // Apply rotation for the rolling effect
+            //    float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
+            //    rb.AddTorque(Vector3.right * rotation);
+            //}
+            if(!gameOverFlag && Acceloro == true)
+            {
+                Debug.Log(" Accelero");
+                Vector3 forwardMovement = Vector3.forward * gameSpeed;
+
+                float tiltInput = Input.acceleration.x;
+                float horizontalInput;
+                if (tiltInput < 0)  // Tilted to the left
+                {
+                    horizontalInput = -1f; // Move left
+                }
+                else if (tiltInput > 0) // Tilted to the right
+                {
+                    horizontalInput = 1f;  // Move right
+                }
+                else
+                {
+                    horizontalInput = 0f; // No tilt or stationary
+                }
+
+                Vector3 horizontalMovement = Vector3.right * horizontalInput * movementSpeed;
+
+                // Apply movement to the ball
+                Vector3 combinedVelocity = forwardMovement + horizontalMovement;
+                rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
+
+                // Clamp the ball's X position within the allowed range
+                Vector3 clampedPosition = rb.position;
+                clampedPosition.x = Mathf.Clamp(rb.position.x, minX, maxX);
+                rb.position = clampedPosition;
+
+                // Apply rotation for the rolling effect
+                float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
+                rb.AddTorque(Vector3.right * rotation);
+
+
+
+            }
+            else if(!gameOverFlag && TouchSystem == true)
+            {
+                Debug.Log(" TouchSystem");
+                Vector3 forwardMovement = Vector3.forward * gameSpeed;
+
+                float touchInput = 0f;
+                Vector2 touchPosition = Input.mousePosition; // Or Input.touch.position for mobile
+                float screenWidth =UnityEngine.Screen.width;
+
+                if (touchPosition.x < screenWidth / 2) // Left side touch
+                {
+                    touchInput = -1f; // Move left
+                }
+                else if (touchPosition.x > screenWidth / 2) // Right side touch
+                {
+                    touchInput = 1f; // Move right
+                }
+
+                Vector3 horizontalMovement = Vector3.right * touchInput * movementSpeed;
+
+                // Apply movement to the ball
+                Vector3 combinedVelocity = forwardMovement + horizontalMovement;
+                rb.linearVelocity = new Vector3(combinedVelocity.x, rb.linearVelocity.y, combinedVelocity.z);
+
+                // Clamp the ball's X position within the allowed range
+                Vector3 clampedPosition = rb.position;
+                clampedPosition.x = Mathf.Clamp(rb.position.x, minX, maxX);
+                rb.position = clampedPosition;
+
+                // Apply rotation for the rolling effect
+                float rotation = gameSpeed * Time.fixedDeltaTime * rotationalSpeed;
+                rb.AddTorque(Vector3.right * rotation);
+            }
+
         }
     }
     private void OnTriggerEnter(Collider other)
